@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QR Code Scanner</title>
+    <script src="html5-qrcode.min.js"></script>
+    <style>
+        #reader {
+            width: 300px;
+            height: 300px;
+            border: 1px solid black;
+        }
+    </style>
+</head>
+<body>
+    <h1>QR Code Scanner</h1>
+    <div id="reader"></div>
+    <p id="res">Scanned result will appear here...</p>
+    <p id="exist"></p>
+    <script defer>
+        const reader = new Html5Qrcode("reader");
+        const out = document.getElementById("res");
+
+        function startScanner() {
+            document.getElementById("exist").innerText=""
+            reader
+                .start(
+                    { facingMode: "environment" },
+                    { fps: 10, qrbox: 250 },
+                    (decodedText) => {
+                        out.innerText = `Scanned Code: ${decodedText}`;
+                        let data={id:decodedText}
+                        let js=JSON.stringify(data)
+                        fetch('http://localhost:3000/validate_user',{
+                            method:'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body:js
+                        }).then((response)=>{
+                            if (response.ok){
+                             document.getElementById("exist").innerText="the passenger exist"
+                             document.getElementById("exist").style.fontSize="20px"
+                             document.getElementById("exist").style.color="green"
+                            }
+                            else {
+                             document.getElementById("exist").innerText="the passenger dosn't exist"
+                             document.getElementById("exist").style.fontSize="20px"
+                             document.getElementById("exist").style.color="red"
+                            }
+                        })
+                    },
+                    (error) => {
+                        console.warn("Scanning failed: ", error);
+                    }
+                )
+                .catch((err) => {
+                    console.error("Failed to start scanner: ", err);
+                });
+        }
+
+        startScanner();
+    </script>
+</body>
+</html>

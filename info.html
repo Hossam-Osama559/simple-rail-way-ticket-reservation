@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Railway Reservation</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+        .container {
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        label {
+            font-weight: bold;
+            margin-top: 10px;
+            display: block;
+        }
+        input, select, button {
+            width: 100%;
+            padding: 10px;
+            margin: 8px 0;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Railway Reservation Form</h1>
+    <form id="reservationForm">
+        <label for="fromStation">From Station</label>
+        <select id="fromStation" name="fromStation" required>
+            <option value="">Select a station</option>
+            <option value="Station A">Station A</option>
+            <option value="Station B">Station B</option>
+            <option value="Station C">Station C</option>
+            <option value="Station D">Station D</option>
+        </select>
+
+        <label for="arrivalStation">Arrival Station</label>
+        <select id="arrivalStation" name="arrivalStation" required>
+            <option value="">Select a station</option>
+            <option value="Station A">Station A</option>
+            <option value="Station B">Station B</option>
+            <option value="Station C">Station C</option>
+            <option value="Station D">Station D</option>
+        </select>
+
+        <label for="passengerId">Passenger ID</label>
+        <input type="text" id="passengerId" name="passengerId" required />
+
+        <label for="passengerName">Name</label>
+        <input type="text" id="passengerName" name="passengerName" required />
+
+        <label for="journeyDate">Date of Journey</label>
+        <input type="date" id="journeyDate" name="journeyDate" required />
+
+        <button type="submit">get your tickit qr-code</button>
+    </form>
+</div>
+
+<script>
+    document.getElementById("reservationForm").addEventListener("submit", function(event) {
+        event.preventDefault();
+
+        const formData = new FormData(this);
+
+        const reservationDetails = {
+            fromStation: formData.get("fromStation"),
+            arrivalStation: formData.get("arrivalStation"),
+            passengerId: formData.get("passengerId"),
+            passengerName: formData.get("passengerName"),
+            journeyDate: formData.get("journeyDate")
+        };
+
+        const json = JSON.stringify(reservationDetails);
+        
+        fetch('http://localhost:3000/info', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: json
+        })
+        .then((response) => {
+            if (response.ok) {
+                // After form submission and QR code generation, trigger the file download
+                fetch('http://localhost:3000/down')
+                    .then((downloadResponse) => {
+                        if (downloadResponse.ok) {
+                            return downloadResponse.blob();
+                        }
+                        throw new Error('Failed to download QR code');
+                    })
+                    .then((blob) => {
+                      console.log(1111)
+                        // Create a temporary link to initiate the download
+                        const link = document.createElement('a');
+                        link.href = URL.createObjectURL(blob);
+                        link.download = 'your_qrcode.png'; // The file name for download
+                        link.click();
+                    })
+                    .catch((error) => {
+                        console.error('Error during download:', error);
+                    });
+            } else {
+                console.error('Failed to generate QR code');
+            }
+        })
+        .catch((error) => {
+            console.error('Error during form submission:', error);
+        });
+    });
+</script>
+
+
+</body>
+</html>
+
+
