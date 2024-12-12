@@ -10,6 +10,6 @@ and using express to handle end points and serve static files
 and simple mysql database consist of 2 tables one for tickit and one for employees
 
 
-navigate to http://localhost:3000/wel to reserve tickit and get qrcode 
+navigate to http://localhost:3000/wel on your local host to reserve tickit and get qrcode 
 
-navigate to http://localhost:3000/validate if you are employee to go to ecanner 
+navigate to http://localhost:3000/validate on your local host if you are employee to go to ecanner 
